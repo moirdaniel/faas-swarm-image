@@ -7,20 +7,16 @@ RUN apk add --no-cache git ca-certificates
 # Permite fijar versión / commit
 ARG FAAS_SWARM_REF=master
 
-# Clonamos el repo oficial (archivado)
 RUN git clone https://github.com/openfaas/faas-swarm.git . \
   && git checkout "${FAAS_SWARM_REF}"
 
-# 🔥 Ignorar vendor inconsistente
+# Ignorar vendor inconsistente
 ENV GOFLAGS="-mod=mod"
 ENV GOPROXY="https://proxy.golang.org,direct"
 
-# Compilación
-RUN go build -o /out/faas-swarm ./...
+# ✅ Compila SOLO el main del repo (un binario)
+RUN go build -o /out/faas-swarm .
 
-# -------------------------
-# Imagen final (runtime)
-# -------------------------
 FROM alpine:3.20
 
 RUN apk add --no-cache ca-certificates
